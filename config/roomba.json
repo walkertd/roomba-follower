@@ -1,0 +1,7 @@
+{
+  "blid": "yourrobotblid",
+  "password": "yourrobotpassword",
+  "robotIP": "yourrobotip",
+  "pollInterval": 800,
+  "pollTimeout": 200
+}
