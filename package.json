@@ -1,0 +1,21 @@
+{
+  "name": "roomba-follower",
+  "version": "1.0.0",
+  "description": "Logs the path of a Roomba 980.",
+  "main": "index.js",
+  "scripts": {
+    "main": "node ./index.js"
+  },
+  "author": "walkertd",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "dorita980": "^3.0.6",
+    "pg-promise": "^5.5.7"
+  },
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/walkertd/roomba-follower.git"
+  }
+}
