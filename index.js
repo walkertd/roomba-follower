@@ -14,6 +14,14 @@ var password = robotConfig.password;
 var robotIP = robotConfig.robotIP;
 var pollInterval = robotConfig.pollInterval;
 var pollTimeout = robotConfig.pollTimeout;
+var inactiveRecordingInterval = robotConfig.inactiveRecordingInterval;
+
+// TODO - Support for firmware version 1.x.
+
+if(!pollInterval || !pollTimeout || !inactiveRecordingInterval) {
+	debug('Time interval not set.');
+	throw new Error('Robot timeout intervals not set.  Please edit config/roomba.json file with your desired timeouts.');
+}
 
 if (!blid || !password) {
 	debug('Robot blid or password was not set.');
@@ -34,7 +42,8 @@ var db = pgp(connectionString);
 var myRobot = {};
 var missionNumber = 0;
 var missionSequence = 0;
-var lastCycle = null;
+var lastMsg = null;
+var tick = 0;
 
 debug(`Connecting to robot ${blid} at ${robotIP}`);
 
@@ -68,16 +77,21 @@ function pollRoomba() {
 		debug("Received data");
 		debug(util.inspect(msg, {depth: null, colors: true}));
 		if(msg.nMssn != missionNumber) {
-			debug(`Begun mission ${missionNumber}...`);
 			missionNumber = msg.cleanMissionStatus.nMssn;
+			debug(`Begun mission ${missionNumber}...`);
 			missionSequence = 0;
-		} 
-		if(msg.cleanMissionStatus.cycle != 'none' || lastCycle != 'none') {
+		}
+		if(!checkMessageEquality(msg, lastMsg)) {
+			debug('Message payload differs from last.  Resetting tick counter.');
+			tick = 0;
+			lastMsg = msg;
+		}
+		if(msg.cleanMissionStatus.phase == 'run' || tick % inactiveRecordingInterval == 0) {
 			debug(`Writing data to database...`)
 			missionSequence = missionSequence + 1;
-			lastCycle = msg.cleanMissionStatus.cycle;
 			recordData(convertMsgToData(msg));
-		}		
+		}
+		tick = tick + 1;
 		setTimeout(pollRoomba, pollInterval);			
 	});
 }
@@ -86,6 +100,7 @@ function convertDataToMsg(data) {
 	var msg = {
 		cleanMissionStatus: {
 			nMssn: data.mission_number,
+			time_stamp: data.time_stamp,
 			sequence: data.sequence,
 			initiator: data.initiator,
 			cycle: data.cycle,
@@ -132,6 +147,26 @@ function convertMsgToData(msg) {
 		bin_full: msg.bin.full
 	};
 	return data;
+}
+
+function checkMessageEquality(msg1, msg2) {
+	if(msg1 == null || msg2 == null)
+		return false;
+	return msg1.cleanMissionStatus.nMssn == msg2.cleanMissionStatus.nMssn &&
+		   msg1.cleanMissionStatus.initiator == msg2.cleanMissionStatus.initiator &&
+		   msg1.cleanMissionStatus.cycle == msg2.cleanMissionStatus.cycle &&
+		   msg1.cleanMissionStatus.phase == msg2.cleanMissionStatus.phase &&
+		   msg1.cleanMissionStatus.mssnM == msg2.cleanMissionStatus.mssnM &&
+		   msg1.cleanMissionStatus.sqft == msg2.cleanMissionStatus.sqft &&
+		   msg1.cleanMissionStatus.expireM == msg2.cleanMissionStatus.expireM &&
+		   msg1.cleanMissionStatus.rechrgM == msg2.cleanMissionStatus.rechrgM &&
+		   msg1.cleanMissionStatus.notReady == msg2.cleanMissionStatus.notReady &&
+		   msg1.cleanMissionStatus.error == msg2.cleanMissionStatus.error &&
+		   msg1.pose.theta == msg2.pose.theta &&
+		   msg1.pose.point.x == msg2.pose.point.x &&
+		   msg1.pose.point.y == msg2.pose.point.y &&
+		   msg1.bin.present == msg2.bin.present &&
+		   msg1.bin.full == msg2.bin.full;		   		
 }
 
 checkConnectionToRoomba();

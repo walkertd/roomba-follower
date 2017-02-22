@@ -3,5 +3,6 @@
   "password": "yourrobotpassword",
   "robotIP": "yourrobotip",
   "pollInterval": 800,
-  "pollTimeout": 200
+  "pollTimeout": 200,
+  "inactiveRecordingInterval": 300
 }
