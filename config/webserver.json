@@ -1,6 +1,6 @@
 {
   "port" : 8000,
   "httpsPort" : 8001,
-  "SSLcertificate" : "5432",
-  "SSLkey" : "5432"
+  "SSLcertificate" : "pathToSSLcertificate",
+  "SSLkey" : "pathtoSSLkey"
 }
