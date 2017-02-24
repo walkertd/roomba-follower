@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous">
+
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+</head>
+
+<body>
+
+  <script type="text/javascript">
+    var dataSet = {{ tabledata }};
+    $(document).ready(function () {
+      datatable = $('#missiondata').DataTable({
+        "scrollY": "100%",
+        "scrollCollapse": true,
+        "paging": false,
+        data: dataSet
+      });
+    });
+  </script>
+
+  <div>
+    <table id="missiondata" class="display" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>#</th>
+          <th>cycle</th>
+          <th>phase</th>
+          <th>expireM</th>
+          <th>rechrgM</th>
+          <th>error</th>
+          <th>notReady</th>
+          <th>mssnM</th>
+          <th>sqft</th>
+          <th>initiator</th>
+          <th>nMssn</th>
+          <th>pose:theta</th>
+          <th>pose:point:x</th>
+          <th>pose:point:y</th>
+          <th>bin:present</th>
+          <th>bin:full</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+
+</html>

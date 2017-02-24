@@ -18,7 +18,7 @@ var dataRoute = require('./routes/data');
 var app = express();
 
 nunjucks.configure('views', {
-	autoescape: true,
+	autoescape: false,
 	express: app,
 	watch: true
 })
@@ -31,6 +31,8 @@ app.use(express.static(path.join(__dirname, '/public')));
 
 app.use('/', indexRoute);
 app.use('/data', dataRoute);
+
+// TODO - implement rest API for querying the database
 
 
 // TODO - move index.js to bin/recording.js
