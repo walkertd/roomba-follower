@@ -13,6 +13,7 @@ var nunjucks = require('nunjucks');
 var indexRoute = require('./routes/index');
 var dataRoute = require('./routes/data');
 var apiRoute = require('./routes/api');
+var mapRoute = require('./routes/map');
 
 // Configure Express with Nunjucks
 var app = express();
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use('/', indexRoute);
 app.use('/data', dataRoute);
 app.use('/api', apiRoute);
+app.use('/map', mapRoute);
 
 // TODO - implement rest API for querying the database
 

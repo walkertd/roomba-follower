@@ -54,7 +54,7 @@ function recordData(data) {
 	debug(`Recording data`);
 	//debug(util.inspect(data, {depth: null, colors: true}));
 	var result = db.one("INSERT INTO recordings(${this~}) VALUES (${mission_number}, ${sequence}, ${initiator}, ${cycle}, ${phase}, \
-		${elapsed_time}, ${area_cleaned}, ${expirem}, ${rechrgm}, ${notready}, ${error}, ${pose_theta}, ${pose_x}, ${pose_y}, ${bin_present}, ${bin_full}) returning (${this~})", data)
+		${elapsed_time}, ${area_cleaned}, ${expirem}, ${rechrgm}, ${notready}, ${error}, ${pose_theta}, ${pose_x}, ${pose_y}, ${bin_present}, ${bin_full}, ${battery_percent}) returning (${this~})", data)
 		.then((result) => {
 			debug(`Insert returned result.`)
 			debug(util.inspect(result, { depth: null, colors: true }));
@@ -75,7 +75,7 @@ function pollRoomba() {
 	debug("Polling roomba");
 	myRobot.local.getMission().then(function(msg) {
 		debug("Received data");
-		//debug(util.inspect(msg, {depth: null, colors: true}));
+		debug(util.inspect(msg, {depth: null, colors: true}));
 		if(msg.cleanMissionStatus.nMssn != missionNumber) {
 			missionNumber = msg.cleanMissionStatus.nMssn;
 			debug(`Begun mission ${missionNumber}...`);
@@ -124,7 +124,8 @@ function convertDataToMsg(data) {
 		bin: {
 			present: data.bin_present,
 			full: data.bin_full
-		}
+		},
+		batPct: data.battery_percent
 	};
 	return msg;
 }
@@ -146,7 +147,8 @@ function convertMsgToData(msg) {
 		pose_x: msg.pose.point.x,
 		pose_y: msg.pose.point.y,
 		bin_present: msg.bin.present,
-		bin_full: msg.bin.full
+		bin_full: msg.bin.full,
+		battery_percent: msg.batPct
 	};
 	return data;
 }

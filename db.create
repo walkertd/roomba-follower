@@ -16,5 +16,6 @@ CREATE TABLE recordings (
     pose_x real,
     pose_y real,
     bin_present boolean,
-    bin_full boolean
+    bin_full boolean,
+    battery_percent integer
 );
