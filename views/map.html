@@ -37,6 +37,14 @@
         value='' /> <button type="button" onclick='saveValues();'>Save values</button>
     </div>
 
+    <div>
+      Select mission: <input type="text" id="selectedMission" list="missionList"/>
+      <datalist id="missionList">
+        <option value="1">
+      </datalist>
+      <button type="button" onClick="showMission();">Show Mission</button>
+    </div>
+
     <div><span class='' id='mapStatus'></span></div>
 
     <div>Command response:

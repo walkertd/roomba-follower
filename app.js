@@ -35,13 +35,11 @@ app.use('/data', dataRoute);
 app.use('/api', apiRoute);
 app.use('/map', mapRoute);
 
-// TODO - implement rest API for querying the database
+// TODO - select item in mission list when updated
 
-
-// TODO - move index.js to bin/recording.js
-// TODO - make recording entry in packages.json (node.js./bin/recording.js)
-// TODO - make start script for recording
-
+// TODO - read up on Bootstrap
+// TODO - read up on jQuery
+// TODO - read up on jQueryUI
 
 // Error handling middleware
 
