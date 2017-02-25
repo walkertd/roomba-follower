@@ -6,8 +6,8 @@ var dorita980 = require('dorita980');
 var util = require('util');
 var pgp = require('pg-promise')();
 
-var robotConfig = require('./config/roomba.json');
-var dbConfig = require('./config/db.json');
+var robotConfig = require('../config/roomba.json');
+var dbConfig = require('../config/db.json');
 
 var blid = robotConfig.blid;
 var password = robotConfig.password;
@@ -52,7 +52,7 @@ myRobot.local = new dorita980.Local(blid, password, robotIP);
 
 function recordData(data) {
 	debug(`Recording data`);
-	debug(util.inspect(data, {depth: null, colors: true}));
+	//debug(util.inspect(data, {depth: null, colors: true}));
 	var result = db.one("INSERT INTO recordings(${this~}) VALUES (${mission_number}, ${sequence}, ${initiator}, ${cycle}, ${phase}, \
 		${elapsed_time}, ${area_cleaned}, ${expirem}, ${rechrgm}, ${notready}, ${error}, ${pose_theta}, ${pose_x}, ${pose_y}, ${bin_present}, ${bin_full}) returning (${this~})", data)
 		.then((result) => {
@@ -75,8 +75,8 @@ function pollRoomba() {
 	debug("Polling roomba");
 	myRobot.local.getMission().then(function(msg) {
 		debug("Received data");
-		debug(util.inspect(msg, {depth: null, colors: true}));
-		if(msg.nMssn != missionNumber) {
+		//debug(util.inspect(msg, {depth: null, colors: true}));
+		if(msg.cleanMissionStatus.nMssn != missionNumber) {
 			missionNumber = msg.cleanMissionStatus.nMssn;
 			debug(`Begun mission ${missionNumber}...`);
 			missionSequence = 0;
@@ -89,7 +89,9 @@ function pollRoomba() {
 		if(msg.cleanMissionStatus.phase == 'run' || tick % inactiveRecordingInterval == 0) {
 			debug(`Writing data to database...`)
 			missionSequence = missionSequence + 1;
-			recordData(convertMsgToData(msg));
+			var data = convertMsgToData(msg);
+			data.sequence = missionSequence;
+			recordData(data);
 		}
 		tick = tick + 1;
 		setTimeout(pollRoomba, pollInterval);			
