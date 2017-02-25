@@ -9,7 +9,6 @@ var router = express.Router();
 
 var database = require('../lib/database');
 
-router.get('/records/all', getAllRecordings);
 router.get('/records/mission/:mission', function (req, res) {
     database.db.any('select * from recordings where mission_number=$1', req.params.mission)
         .then(function (data) { res.json(data); })
@@ -30,8 +29,19 @@ router.get('/records/mission/:mission/cycle/:cycle/phase/:phase', function (req,
         .then(function (data) { res.json(data); })
         .catch(function (error) { res.send(error); });
 });
-// TODO - /records/after/:after and /records/before/:before
+router.get('/records/id/:id', function (req, res) {
+    database.db.any('select * from recordings where id=$1', req.params.id)
+        .then(function (data) { res.json(data); })
+        .catch(function (error) { res.send(error); });
+});
+router.get('/records/latest', function (req, res) {
+    database.db.any('select * from recordings where id=(select max(id) from recordings)')
+        .then(function (data) { res.json(data); })
+        .catch(function (error) { res.send(error); });
+});
+router.get('/records/all', getAllRecordings);
 router.get('/records', getAllRecordings);
+// TODO - /records/after/:after and /records/before/:before
 
 router.get('/list/missions', function(req, res) {
     database.db.any('select mission_number from recordings group by mission_number')
