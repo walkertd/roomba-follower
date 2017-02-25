@@ -4,7 +4,7 @@
   "description": "Logs the path of a Roomba 980.",
   "main": "index.js",
   "scripts": {
-    "main": "node ./index.js",
+    "recording": "node ./bin/recording.js",
     "webserver": "node ./bin/webserver.js"
   },
   "author": "walkertd",
