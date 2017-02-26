@@ -12,7 +12,7 @@ var database = require('../lib/database');
 router.get('/', function(req, res) {
     database.db.any({text: 'select * from recordings', rowMode: 'array'})
         .then(function (data) {
-            res.render(path.join('data','all.html'), { title: 'All data', tabledata: JSON.stringify(data)});
+            res.render('data.html', { title: 'All data', tabledata: JSON.stringify(data)});
         })
         .catch(function(error) {
             res.send(error);

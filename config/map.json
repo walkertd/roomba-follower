@@ -1,7 +1,5 @@
 {
-  "offsetX": "120",
-  "offsetY": "505",
-  "sizeW": "600",
-  "sizeH": "600",
+  "sizeW": "1000",
+  "sizeH": "800",
   "pointIntervalMs": "800"
 }

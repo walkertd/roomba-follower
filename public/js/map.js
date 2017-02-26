@@ -1,5 +1,4 @@
 'use strict';
-window.onload = startApp;
 
 var pathLayerContext;
 var robotBodyLayerContext;
@@ -8,21 +7,26 @@ var textLayerContext;
 var pathLayer;
 var robotBodyLayer;
 var textLayer;
+var xOffset;
+var yOffset;
 
-var records;
+var xPrevious;
+var yPrevious;
+
+var robotData = [];
 
 var lastPhase = '';
-var mapping = true;
 
-function startApp() {
+var playbackContinuous = false;
+var playbackStep = 0;
+
+$(document).ready(function () {
   pathLayer = document.getElementById('path_layer');
   robotBodyLayer = document.getElementById('robot_body_layer');
   textLayer = document.getElementById('text_layer');
 
   pathLayer.width = sizeX;
   pathLayer.height = sizeY;
-
-  records = 0;
 
   robotBodyLayer.width = sizeX;
   robotBodyLayer.height = sizeY;
@@ -38,7 +42,7 @@ function startApp() {
 
   $('#updateevery').val(updateEvery);
   updateMissionList();
-  startMissionLoop();
+  setPlaybackButtonStatus(false);
 
   pathLayerContext = pathLayer.getContext('2d');
   robotBodyLayerContext = robotBodyLayer.getContext('2d');
@@ -48,13 +52,13 @@ function startApp() {
   pathLayerContext.lineWidth = 1;
   pathLayerContext.strokeStyle = '#000000';
   pathLayerContext.lineCap = 'round';
-}
+});
 
 function updateMissionList() {
   $.get('/api/list/missions', function (result) {
     var missionList = $('#missionList');
     missionList.empty();
-    result.forEach(function(element, index, array) {
+    result.forEach(function (element, index, array) {
       $("<option />", {
         value: element,
         text: element
@@ -62,85 +66,166 @@ function updateMissionList() {
     });
     $("#missionList selected").val(result[0]);
     $('#mapStatus').text(`Found ${result.length} missions in the database.`);
-    // $('#missionList').on('input', function(e) {
-    //   var selected = $(this).val();
-    //   $('#mapStatus').text(`Selected mission ${selected}`);
-    // });
   });
 }
 
 function showMission() {
-
+  clearMap();
+  var missionNumber = $('#missionList').val();
+  $('#mapStatus').text(`Displaying map for mission ${missionNumber}.`);
+  $.get(`/api/scale/mission/${missionNumber}`, function (data) {
+    scaleMapToFitLimits(data);
+  });
+  $.get(`/api/records/mission/${missionNumber}`, function (data) {
+    robotData = data;
+    xPrevious = parseInt(data[0].pose_x, 10);
+    yPrevious = parseInt(data[0].pose_y, 10);
+    playbackFirst();
+    $('div#playbackStepInfo').show("easing");
+    setPlaybackButtonStatus(true);
+  });
 }
 
-function startMissionLoop() {
-  if (mapping) {
-    $('#mapStatus').html('starting mission loop...');
-    $.get('/api/local/info/mission', function (data) {
-      messageHandler(data);
-      setTimeout(startMissionLoop, updateEvery);
-    });
-  } else {
-    $('#mapStatus').html('stopped');
+function scaleMapToFitLimits(mapLimits) {
+  var requiredHeight = parseInt(mapLimits.max_pose_x, 10) - parseInt(mapLimits.min_pose_x, 10) + 50;
+  var requiredWidth = parseInt(mapLimits.max_pose_y, 10) - parseInt(mapLimits.min_pose_y, 10) + 50; // height and width are swapped with x and y since the map is rotated 90 degrees
+  var scaleX = Math.max(pathLayer.width / requiredWidth, 1.0);
+  var scaleY = Math.max(pathLayer.height / requiredHeight, 1.0);
+  var mapScale = Math.min(scaleX, scaleY);
+
+  // yOffset = (requiredHeight - parseInt(mapLimits.min_pose_x, 10)) / mapScale;
+  // xOffset = (requiredWidth - parseInt(mapLimits.min_pose_y, 10)) / mapScale; 
+
+  // tx = height - y_pos - yoffset;
+  // ty = width - x_pos - xoffset;
+  // yoffset = tx - height + y_pos;
+  yOffset = Math.abs(Math.min(parseInt(mapLimits.min_pose_y, 10), 0));
+  // xoffset = ty - width + x_pos; 
+  xOffset = Math.abs(Math.min(parseInt(mapLimits.min_pose_x, 10), 0));
+
+  $('#offsety').val(yOffset);
+  $('#offsetx').val(xOffset);
+
+  // var requiredWidth = parseInt(mapLimits.max_pose_x, 10) - parseInt(mapLimits.min_pose_x, 10) + 100;
+  // var requiredHeight = parseInt(mapLimits.max_pose_y, 10) - parseInt(mapLimits.min_pose_y, 10) + 100;
+  // var maxWidth = Math.max(sizeX, requiredWidth);
+  // var maxHeight = Math.max(sizeY, requiredHeight);
+  // var widthScale = sizeX / maxWidth;
+  // var heightScale = sizeY / maxHeight;
+  // mapScale = Math.max(widthScale, heightScale);
+  pathLayerContext.scale(mapScale, mapScale);
+  robotBodyLayerContext.scale(mapScale, mapScale);
+  textLayerContext.scale(mapScale, mapScale);
+  console.log(`Scaling to ${mapScale}`);
+}
+
+function setPlaybackButtonStatus(buttonStatus) {
+  $('#playbackFirstButton').attr("disabled", !buttonStatus);
+  $('#playbackReverseButton').attr("disabled", !buttonStatus);
+  $('#playbackPauseButton').attr("disabled", !buttonStatus);
+  $('#playbackForwardButton').attr("disabled", !buttonStatus);
+  $('#playbackLastButton').attr("disabled", !buttonStatus);
+  $('#playbackStepBackButton').attr("disabled", !buttonStatus);
+  $('#playbackStepForwardButton').attr("disabled", !buttonStatus);
+}
+
+function playbackFirst() {
+  playbackContinuous = false;
+  playbackStep = 1;
+  updateStep();
+}
+
+function playbackLast() {
+  playbackContinuous = false;
+  playbackStep = robotData.length;
+  updateStep();
+}
+
+function playbackPause() {
+  playbackContinuous = false;
+}
+
+function playbackForward(repeat) {
+  if (repeat != null)
+    playbackContinuous = repeat;
+  else if (repeat == null && playbackContinuous == false)
+    return;
+  if (playbackStep < robotData.length) {
+    playbackStep = playbackStep + 1;
+    updateStep();
+    if (playbackContinuous) {
+      setTimeout(playbackForward, updateEvery);
+    }
   }
 }
 
-function addMissionData(msg) {
-  records = records + 1;
+function playbackReverse(repeat) {
+  if (repeat != null)
+    playbackContinuous = repeat;
+  else if (repeat == null && playbackContinuous == false)
+    return;
+  if (playbackStep > 1) {
+    playbackStep = playbackStep - 1;
+    updateStep();
+    if (playbackContinuous) {
+      setTimeout(playbackReverse, updateEvery);
+    }
+  }
+}
 
-  var table = $('#missiondata').DataTable();
-  table.row.add([
-    records,
-    msg.cleanMissionStatus.cycle,
-    msg.cleanMissionStatus.phase,
-    msg.cleanMissionStatus.expireM,
-    msg.cleanMissionStatus.rechrgM,
-    msg.cleanMissionStatus.error,
-    msg.cleanMissionStatus.notReady,
-    msg.cleanMissionStatus.mssnM,
-    msg.cleanMissionStatus.sqft,
-    msg.cleanMissionStatus.initiator,
-    msg.cleanMissionStatus.nMssn,
-    msg.pose.theta,
-    msg.pose.point.x,
-    msg.pose.point.y,
-    msg.bin.present,
-    msg.bin.full
-  ]).draw(false);
+function updateStep() {
+  $('#playbackCurrentStep').val(playbackStep);
+  $('#playbackTotalSteps').val(robotData.length);
 
+  var record = robotData[playbackStep - 1];
+
+  $('#mapStatus').html(`Drawing step ${playbackStep} of ${robotData.length}`);
+  $('#missionNum').html(record.mission_number);
+  $('#missionStep').html(playbackStep);
+  $('#missionTime').html(record.elapsed_time);
+  $('#initiator').html(record.initiator);
+  $('#cycle').html(record.cycle);
+  $('#phase').html(record.phase);
+  $('#batPct').html(record.battery_percent);
+  $('#error').html(record.error);
+  $('#sqft').html(record.area_cleaned);
+  $('#expireM').html(record.expirem);
+  $('#rechrgM').html(record.rechrgm);
+  $('#notReady').html(record.notready);
+  $('#theta').html(record.pose_theta);
+  $('#x').html(record.pose_x);
+  $('#y').html(record.pose_y);
+  $('#binfull').html(record.bin_full.toString());
+  $('#binpresent').html(record.bin_present.toString());
+
+  drawStep(
+    record.pose_x,
+    record.pose_y,
+    record.pose_theta,
+    record.cycle,
+    record.phase
+  );
 
 }
 
-function messageHandler(msg) {
-  // msg is the object returned by dorita980.getMission() promise.
+function coordinateTranslate(x, y) {
+  x = pathLayer.width - (parseInt(x, 10) + xOffset);
+  y = (parseInt(y, 10) + yOffset);
+  // var oldX = x;
 
-  addMissionData(msg);
+  // // rotate
+  // x = y;
+  // y = pathLayer.height - oldX;
+  // x = pathLayer.width - x;
 
-  // msg.ok.time = new Date().toISOString();
-  $('#mapStatus').html('drawing...');
-  $('#last').html(records);
-  $('#missionNum').html(msg.cleanMissionStatus.nMssn);
-  $('#missionTime').html(msg.cleanMissionStatus.mssnM);
-  $('#cycle').html(msg.cleanMissionStatus.cycle);
-  $('#phase').html(msg.cleanMissionStatus.phase);
-  $('#flags').html(msg.cleanMissionStatus.flags);
-  $('#batPct').html(msg.cleanMissionStatus.batPct);
-  $('#error').html(msg.cleanMissionStatus.error);
-  $('#sqft').html(msg.cleanMissionStatus.sqft);
-  $('#expireM').html(msg.cleanMissionStatus.expireM);
-  $('#rechrgM').html(msg.cleanMissionStatus.rechrgM);
-  $('#notReady').html(msg.cleanMissionStatus.notReady);
-  $('#theta').html(msg.pose.theta);
-  $('#x').html(msg.pose.point.x);
-  $('#y').html(msg.pose.point.y);
+  return { x: x, y: y };
+}
 
-  drawStep(
-    msg.pose.point.x,
-    msg.pose.point.y,
-    msg.pose.theta,
-    msg.cleanMissionStatus.cycle,
-    msg.cleanMissionStatus.phase
-  );
+function checkForTeleportation(x, y) {
+  var distance = Math.sqrt(Math.pow(xPrevious - x, 2) + Math.pow(yPrevious - y, 2));
+  xPrevious = x;
+  yPrevious = y;
+  return distance > 100; 
 }
 
 function drawStep(x, y, theta, cycle, phase) {
@@ -150,14 +235,11 @@ function drawStep(x, y, theta, cycle, phase) {
     y = 0;
   }
 
-  x = parseInt(x, 10) + xOffset;
-  y = parseInt(y, 10) + yOffset;
-  var oldX = x;
+  var isTeleporting = checkForTeleportation(x, y);
 
-  // rotate
-  x = y;
-  y = pathLayer.height - oldX;
-  x = pathLayer.width - x;
+  var coordinates = coordinateTranslate(x, y);
+  x = coordinates.x;
+  y = coordinates.y;
 
   drawRobotBody(x, y, theta);
 
@@ -168,8 +250,13 @@ function drawStep(x, y, theta, cycle, phase) {
     textLayerContext.fillText(phase, x, y);
     lastPhase = phase;
   } else {
-    pathLayerContext.lineTo(x, y);
-    pathLayerContext.stroke();
+    if(isTeleporting) {
+      pathLayerContext.moveTo(x,y);
+      pathLayerContext.stroke();
+    } else {
+      pathLayerContext.lineTo(x, y);   
+      pathLayerContext.stroke();
+    }
   }
 }
 
@@ -202,11 +289,9 @@ function clearMap() {
   robotBodyLayerContext.clearRect(0, 0, robotBodyLayer.width, robotBodyLayer.height);
   textLayerContext.clearRect(0, 0, textLayer.width, textLayer.height);
   pathLayerContext.beginPath();
-}
-
-function toggleMapping() {
-  mapping = !mapping;
-  if (mapping) startMissionLoop();
+  robotBodyLayerContext.scale(1, 1);
+  textLayerContext.scale(1, 1);
+  pathLayerContext.scale(1, 1);
 }
 
 function getValue(name, actual) {
@@ -219,33 +304,10 @@ function getValue(name, actual) {
   return newValue;
 }
 
-function downloadCanvas() {
-  var bodyCanvas = document.getElementById('robot_body_layer');
-  var pathCanvas = document.getElementById('path_layer');
-
-  var bodyContext = bodyCanvas.getContext('2d');
-  bodyContext.drawImage(pathCanvas, 0, 0);
-
-  document.getElementById('download').href = bodyCanvas.toDataURL();
-  document.getElementById('download').download = 'current_map.png';
-}
-
 function shiftCanvas(ctx, w, h, dx, dy) {
   var imageData = ctx.getImageData(0, 0, w, h);
   ctx.clearRect(0, 0, w, h);
   ctx.putImageData(imageData, dx, dy);
-}
-
-function saveValues() {
-  var values = {
-    'offsetX': getValue('#offsetx', xOffset),
-    'offsetY': getValue('#offsety', yOffset),
-    'sizeW': getValue('#sizew', pathLayer.width),
-    'sizeH': getValue('#sizeh', pathLayer.height),
-    'pointIntervalMs': updateEvery
-  };
-  $.post('/map/values', values, function (data) {
-  });
 }
 
 $('.metrics').on('change', function () {
@@ -291,16 +353,6 @@ $('.metrics').on('change', function () {
     shiftCanvas(textLayerContext, w, h, 0, (xOffset - newXOffset));
     xOffset = newXOffset;
   }
-});
-
-$('.action').on('click', function () {
-  var me = $(this);
-  var path = me.data('action');
-  me.button('loading');
-  $.get(path, function (data) {
-    me.button('reset');
-    $('#apiresponse').html(JSON.stringify(data));
-  });
 });
 
 $('#updateevery').on('change', function () {

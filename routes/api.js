@@ -35,7 +35,7 @@ router.get('/records/id/:id', function (req, res) {
         .catch(function (error) { res.send(error); });
 });
 router.get('/records/latest', function (req, res) {
-    database.db.any('select * from recordings where id=(select max(id) from recordings)')
+    database.db.any('select * from recordings where id=(select max(id) from recordings)', req.params.mission)
         .then(function (data) { res.json(data); })
         .catch(function (error) { res.send(error); });
 });
@@ -43,10 +43,16 @@ router.get('/records/all', getAllRecordings);
 router.get('/records', getAllRecordings);
 // TODO - /records/after/:after and /records/before/:before
 
-router.get('/list/missions', function(req, res) {
-    database.db.any('select mission_number from recordings group by mission_number')
+router.get('/scale/mission/:mission', function (req, res) {
+    database.db.one('select max(pose_x) as max_pose_x, min(pose_x) as min_pose_x, max(pose_y) as max_pose_y, min(pose_y) as min_pose_y from recordings where mission_number=$1', req.params.mission)
+        .then(function (data) { res.json(data); })
+        .catch(function (error) { res.send(error);});
+});
+
+router.get('/list/missions', function (req, res) {
+    database.db.any('select mission_number from recordings group by mission_number order by mission_number asc')
         .then(function (data) {
-            res.json(data.map(function(row) {
+            res.json(data.map(function (row) {
                 return row.mission_number;
             }));
         })

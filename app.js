@@ -37,11 +37,11 @@ app.use('/api', apiRoute);
 app.use('/map', mapRoute);
 app.use('/help', helpRoute);
 
-// TODO - select item in mission list when updated
 
-// TODO - read up on Bootstrap
-// TODO - read up on jQuery
-// TODO - read up on jQueryUI
+// TODO - fix map so it scales to max/min coordinates
+// TODO - better detection of 'teleportation'
+// TODO - vector display system
+
 
 // Error handling middleware
 

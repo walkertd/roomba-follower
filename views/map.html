@@ -22,11 +22,9 @@
 
   <script type="text/javascript">
     var mapConfig = {{mapvalues}};
-    var xOffset = mapConfig.offsetX;
-    var yOffset = mapConfig.offsetY;
-    var sizeX = mapConfig.sizeW;
-    var sizeY = mapConfig.sizeH;
-    var updateEvery = mapConfig.pointIntervalMs;
+    var sizeX = parseInt(mapConfig.sizeW, 10);
+    var sizeY = parseInt(mapConfig.sizeH, 10);
+    var updateEvery = parseInt(mapConfig.pointIntervalMs, 10);
   </script>
 
   <div>
@@ -34,7 +32,7 @@
       Update every: <input type='text' id='updateevery' size='5' value='' />ms. Canvas size: w:<input type='text' class='metrics'
         id='sizew' size='5' value='' /> h:<input class='metrics' type='text' id='sizeh' size='5' value='' /> Offsets: x:<input
         type='text' class='metrics' id='offsetx' size='5' value='' /> y:<input class='metrics' type='text' id='offsety' size='5'
-        value='' /> <button type="button" onclick='saveValues();'>Save values</button>
+        value='' />
     </div>
 
     <div>
@@ -42,11 +40,17 @@
       <button type="button" onClick="showMission();">Show Mission</button>
     </div>
 
-    <div><span class='' id='mapStatus'></span></div>
-
-    <div>Command response:
-      <div id='apiresponse'>ok</div>
+    <div>
+        <button id="playbackFirstButton" onClick="playbackFirst()">First</button>
+        <button id="playbackReverseButton" onClick="playbackReverse(true)">Reverse</button>
+        <button id="playbackPauseButton" onClick="playbackPause()">Pause</button>
+        <button id="playbackForwardButton" onClick="playbackForward(true)">Forward</button>
+        <button id="playbackLastButton" onClick="playbackLast()">Last</button>
+        <button id="playbackStepBackButton" onClick="playbackReverse(false)">Step Back</button>
+        <button id="playbackStepForwardButton" onClick="playbackForward(false)">Step Forward</button>  Step <input type="text" id="playbackCurrentStep" size="5" readonly="<false></false>"/> / <input type="text" id="playbackTotalSteps" size="5" readonly="false"/>
     </div>
+
+    <div><span class='' id='mapStatus'></span></div>
 
     <div style="position: relative;">
       <canvas id="path_layer" style="position: absolute; left: 0; top: 0; z-index: 0; border:1px solid #d3d3d3;"></canvas>
@@ -55,12 +59,24 @@
     </div>
   </div>
 
-  <div style='float:right'>
-    Mission #: <span class='data' id='missionNum'></span><br/> Last point: <span class='data' id='last'></span><br/> Mission
-    Time: <span class='data' id='missionTime'></span>min<br/> Cycle: <span class='data' id='cycle'></span><br/> Phase: <span
-      class='data' id='phase'></span><br/> Flags: <span class='data' id='flags'></span><br/> Battery: <span class='data' id='batPct'></span>%<br/>    Error: <span class='data' id='error'></span><br/> Sqft: <span class='data' id='sqft'></span><br/> expireM:
-    <span class='data' id='expireM'></span>min<br/> rechrgM: <span class='data' id='rechrgM'></span>min<br/> notReady: <span
-      class='data' id='notReady'></span><br/> theta: <span class='data' id='theta'></span><br/> x: <span class='data' id='x'></span><br/>    y: <span class='data' id='y'></span><br/>
+  <div style='float:right' id="playbackStepInfo" hidden="true">
+    Mission #: <span class='data' id='missionNum'></span><br/> 
+    Mission step: <span class='data' id='missionStep'></span><br/> 
+    Mission Time: <span class='data' id='missionTime'></span>min<br/>
+    Initiator: <span class='data' id='initiator'></span><br/> 
+    Cycle: <span class='data' id='cycle'></span><br/> 
+    Phase: <span class='data' id='phase'></span><br/> 
+    Battery: <span class='data' id='batPct'></span>%<br/>    
+    Error: <span class='data' id='error'></span><br/> 
+    Sqft: <span class='data' id='sqft'></span><br/> 
+    expireM: <span class='data' id='expireM'></span>min<br/> 
+    rechrgM: <span class='data' id='rechrgM'></span>min<br/> 
+    notReady: <span class='data' id='notReady'></span><br/>
+    theta: <span class='data' id='theta'></span><br/> 
+    x: <span class='data' id='x'></span><br/>    
+    y: <span class='data' id='y'></span><br/>
+    Bin present: <span class='data' id='binpresent'></span><br/>    
+    Bin full: <span class='data' id='binfull'></span><br/>
   </div>
 
   <script src="/js/map.js"></script>

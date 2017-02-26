@@ -19,24 +19,34 @@
 </head>
 
 <body>
-  <h1>API Documentation</h1>
-  <h2>/api/records/mission/$mission</h2>
+  <h2>Documentation</h2>
+  <h3>General</h3>
+  <h4>/</h4>
+  <p>Not useful.  Gives a link to the github.</p>
+  <h4>/data</h4>
+  <p>Display a table of all records.</p>
+  <h4>/help</h4>
+  <p>This documentation.</p>
+  <h4>/map</h4>
+  <p>An interactive map showing history of the roomba's travels, selectable by mission.</p>
+  <h3>API Documentation</h3>
+  <h4>/api/records/mission/$mission</h4>
   <p>Return the recorded data for the given mission ($mission).</p>
-  <h2>/api/records/mission/$mission/cycle/$cycle</h2>
+  <h4>/api/records/mission/$mission/cycle/$cycle</h4>
   <p>Return the recorded data for the given mission ($mission) filtered on cycle ($cycle).</p>
-  <h2>/api/records/mission/$mission/phase/$phase</h2>
+  <h4>/api/records/mission/$mission/phase/$phase</h4>
   <p>Return the recorded data for the given mission ($mission) filtered on phase ($phase).</p>
-  <h2>/api/records/mission/$mission/cycle/$cycle/phase/$phase</h2>
+  <h4>/api/records/mission/$mission/cycle/$cycle/phase/$phase</h4>
   <p>Return the recorded data for the given mission ($mission) filtered on cycle ($cycle) and phase ($phase).</p>
-  <h2>/api/records/id/$id</h2>
+  <h4>/api/records/id/$id</h4>
   <p>Return the record matching id = $id.</p>
-  <h2>/api/records/latest</h2>
+  <h4>/api/records/latest</h4>
   <p>Return the latest record added to the database.</p>
-  <h2>/api/records/all</h2>
+  <h4>/api/records/all</h4>
   <p>Return all recordings.</p>
-  <h2>/api/records</h2>
+  <h4>/api/records</h4>
   <p>Return all recordings.</p>
-  <h2>/api/list/missions</h2>
+  <h4>/api/list/missions</h4>
   <p>Return a list of mission numbers.</p>
 
 </body>
