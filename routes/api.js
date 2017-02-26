@@ -51,7 +51,7 @@ router.get('/list/missions', function(req, res) {
             }));
         })
         .catch(function (error) { res.send(error); });
-})
+});
 
 function getAllRecordings(req, res) {
     database.db.any('select * from recordings')

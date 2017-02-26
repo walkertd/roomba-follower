@@ -14,6 +14,7 @@ var indexRoute = require('./routes/index');
 var dataRoute = require('./routes/data');
 var apiRoute = require('./routes/api');
 var mapRoute = require('./routes/map');
+var helpRoute = require('./routes/help');
 
 // Configure Express with Nunjucks
 var app = express();
@@ -34,6 +35,7 @@ app.use('/', indexRoute);
 app.use('/data', dataRoute);
 app.use('/api', apiRoute);
 app.use('/map', mapRoute);
+app.use('/help', helpRoute);
 
 // TODO - select item in mission list when updated
 

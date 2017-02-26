@@ -56,12 +56,21 @@ function updateMissionList() {
     missionList.empty();
     result.forEach(function(element, index, array) {
       $("<option />", {
-        val: element
+        value: element,
+        text: element
       }).appendTo(missionList);
     });
-    $("#selectedMission selected").val(result[0]);
+    $("#missionList selected").val(result[0]);
     $('#mapStatus').text(`Found ${result.length} missions in the database.`);
+    // $('#missionList').on('input', function(e) {
+    //   var selected = $(this).val();
+    //   $('#mapStatus').text(`Selected mission ${selected}`);
+    // });
   });
+}
+
+function showMission() {
+
 }
 
 function startMissionLoop() {

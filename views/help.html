@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Documentation</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous">
+
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+</head>
+
+<body>
+  <h1>API Documentation</h1>
+  <h2>/api/records/mission/$mission</h2>
+  <p>Return the recorded data for the given mission ($mission).</p>
+  <h2>/api/records/mission/$mission/cycle/$cycle</h2>
+  <p>Return the recorded data for the given mission ($mission) filtered on cycle ($cycle).</p>
+  <h2>/api/records/mission/$mission/phase/$phase</h2>
+  <p>Return the recorded data for the given mission ($mission) filtered on phase ($phase).</p>
+  <h2>/api/records/mission/$mission/cycle/$cycle/phase/$phase</h2>
+  <p>Return the recorded data for the given mission ($mission) filtered on cycle ($cycle) and phase ($phase).</p>
+  <h2>/api/records/id/$id</h2>
+  <p>Return the record matching id = $id.</p>
+  <h2>/api/records/latest</h2>
+  <p>Return the latest record added to the database.</p>
+  <h2>/api/records/all</h2>
+  <p>Return all recordings.</p>
+  <h2>/api/records</h2>
+  <p>Return all recordings.</p>
+  <h2>/api/list/missions</h2>
+  <p>Return a list of mission numbers.</p>
+
+</body>
+
+</html>
