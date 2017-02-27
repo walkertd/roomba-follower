@@ -4,18 +4,19 @@
 <head>
   <title>{{title}}</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-    crossorigin="anonymous">
+    crossorigin="anonymous" />
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-      crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+    crossorigin="anonymous" />
 
-      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" />
 
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
 
-        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.10.2/paper-core.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 </head>
 
 <body>
@@ -41,13 +42,15 @@
     </div>
 
     <div>
-        <button id="playbackFirstButton" onClick="playbackFirst()">First</button>
-        <button id="playbackReverseButton" onClick="playbackReverse(true)">Reverse</button>
-        <button id="playbackPauseButton" onClick="playbackPause()">Pause</button>
-        <button id="playbackForwardButton" onClick="playbackForward(true)">Forward</button>
-        <button id="playbackLastButton" onClick="playbackLast()">Last</button>
-        <button id="playbackStepBackButton" onClick="playbackReverse(false)">Step Back</button>
-        <button id="playbackStepForwardButton" onClick="playbackForward(false)">Step Forward</button>  Step <input type="text" id="playbackCurrentStep" size="5" readonly="<false></false>"/> / <input type="text" id="playbackTotalSteps" size="5" readonly="false"/>
+      <button id="playbackFirstButton" onClick="playbackFirst()">First</button>
+      <button id="playbackReverseButton" onClick="playbackReverse(true)">Reverse</button>
+      <button id="playbackPauseButton" onClick="playbackPause()">Pause</button>
+      <button id="playbackForwardButton" onClick="playbackForward(true)">Forward</button>
+      <button id="playbackLastButton" onClick="playbackLast()">Last</button>
+      <button id="playbackStepBackButton" onClick="playbackReverse(false)">Step Back</button>
+      <button id="playbackStepForwardButton" onClick="playbackForward(false)">Step Forward</button> Step <input type="text"
+        id="playbackCurrentStep" size="5" readonly="<false></false>" /> / <input type="text" id="playbackTotalSteps" size="5"
+        readonly="false" />
     </div>
 
     <div><span class='' id='mapStatus'></span></div>
@@ -60,23 +63,13 @@
   </div>
 
   <div style='float:right' id="playbackStepInfo" hidden="true">
-    Mission #: <span class='data' id='missionNum'></span><br/> 
-    Mission step: <span class='data' id='missionStep'></span><br/> 
-    Mission Time: <span class='data' id='missionTime'></span>min<br/>
-    Initiator: <span class='data' id='initiator'></span><br/> 
-    Cycle: <span class='data' id='cycle'></span><br/> 
-    Phase: <span class='data' id='phase'></span><br/> 
-    Battery: <span class='data' id='batPct'></span>%<br/>    
-    Error: <span class='data' id='error'></span><br/> 
-    Sqft: <span class='data' id='sqft'></span><br/> 
-    expireM: <span class='data' id='expireM'></span>min<br/> 
-    rechrgM: <span class='data' id='rechrgM'></span>min<br/> 
-    notReady: <span class='data' id='notReady'></span><br/>
-    theta: <span class='data' id='theta'></span><br/> 
-    x: <span class='data' id='x'></span><br/>    
-    y: <span class='data' id='y'></span><br/>
-    Bin present: <span class='data' id='binpresent'></span><br/>    
-    Bin full: <span class='data' id='binfull'></span><br/>
+    Mission #: <span class='data' id='missionNum'></span><br/> Mission step: <span class='data' id='missionStep'></span><br/>    Mission Time: <span class='data' id='missionTime'></span>min<br/> Initiator: <span class='data' id='initiator'></span><br/>    Cycle: <span class='data' id='cycle'></span><br/> Phase: <span class='data' id='phase'></span><br/> Battery:
+    <span class='data' id='batPct'></span>%<br/> Error: <span class='data' id='error'></span><br/> Sqft:
+    <span class='data'
+      id='sqft'></span><br/> expireM:
+      <span class='data' id='expireM'></span>min<br/> rechrgM: <span class='data' id='rechrgM'></span>min<br/> notReady:
+      <span class='data' id='notReady'></span><br/> theta: <span class='data' id='theta'></span><br/> x:
+      <span class='data' id='x'></span><br/> y: <span class='data' id='y'></span><br/> Bin present: <span class='data' id='binpresent'></span><br/>      Bin full: <span class='data' id='binfull'></span><br/>
   </div>
 
   <script src="/js/map.js"></script>
