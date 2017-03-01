@@ -86,7 +86,7 @@ function pollRoomba() {
 			tick = 0;
 			lastMsg = msg;
 		}
-		if(msg.cleanMissionStatus.phase == 'run' || tick % inactiveRecordingInterval == 0) {
+		if(msg.cleanMissionStatus.phase == 'run' || msg.cleanMissionStatus.phase == 'hmPostMsn' || tick % inactiveRecordingInterval == 0) {
 			debug(`Writing data to database...`)
 			missionSequence = missionSequence + 1;
 			var data = convertMsgToData(msg);

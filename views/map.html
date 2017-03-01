@@ -11,12 +11,16 @@
 
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" />
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>-->
+
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
     crossorigin="anonymous"></script>
 
-    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.10.2/paper-core.js"></script>
+
+    <!--<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.10.2/paper-core.js"></script>-->
     <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/16.7.3/jcanvas.min.js"/></script>
 </head>
 
 <body>
@@ -56,20 +60,20 @@
     <div><span class='' id='mapStatus'></span></div>
 
     <div style="position: relative;">
-      <canvas id="path_layer" style="position: absolute; left: 0; top: 0; z-index: 0; border:1px solid #d3d3d3;"></canvas>
+      <canvas id="map_canvas" style="position: absolute; left: 0; top: 0; z-index: 0; border: 1px solid #d3d3d3;"></canvas>
+      <!--<canvas id="path_layer" style="position: absolute; left: 0; top: 0; z-index: 0; border:1px solid #d3d3d3;"></canvas>
       <canvas id="robot_body_layer" style="position: absolute; left: 0; top: 0; z-index: 1; border:1px solid #d3d3d3;"></canvas>
-      <canvas id="text_layer" style="position: absolute; left: 0; top: 0; z-index: 2; border:1px solid #d3d3d3;"></canvas>
+      <canvas id="text_layer" style="position: absolute; left: 0; top: 0; z-index: 2; border:1px solid #d3d3d3;"></canvas>-->
     </div>
   </div>
 
   <div style='float:right' id="playbackStepInfo" hidden="true">
     Mission #: <span class='data' id='missionNum'></span><br/> Mission step: <span class='data' id='missionStep'></span><br/>    Mission Time: <span class='data' id='missionTime'></span>min<br/> Initiator: <span class='data' id='initiator'></span><br/>    Cycle: <span class='data' id='cycle'></span><br/> Phase: <span class='data' id='phase'></span><br/> Battery:
     <span class='data' id='batPct'></span>%<br/> Error: <span class='data' id='error'></span><br/> Sqft:
-    <span class='data'
-      id='sqft'></span><br/> expireM:
-      <span class='data' id='expireM'></span>min<br/> rechrgM: <span class='data' id='rechrgM'></span>min<br/> notReady:
-      <span class='data' id='notReady'></span><br/> theta: <span class='data' id='theta'></span><br/> x:
-      <span class='data' id='x'></span><br/> y: <span class='data' id='y'></span><br/> Bin present: <span class='data' id='binpresent'></span><br/>      Bin full: <span class='data' id='binfull'></span><br/>
+    <span class='data' id='sqft'></span><br/> expireM:
+    <span class='data' id='expireM'></span>min<br/> rechrgM: <span class='data' id='rechrgM'></span>min<br/> notReady:
+    <span class='data' id='notReady'></span><br/> theta: <span class='data' id='theta'></span><br/> x:
+    <span class='data' id='x'></span><br/> y: <span class='data' id='y'></span><br/> Bin present: <span class='data' id='binpresent'></span><br/>    Bin full: <span class='data' id='binfull'></span><br/>
   </div>
 
   <script src="/js/map.js"></script>

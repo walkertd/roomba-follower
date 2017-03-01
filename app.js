@@ -38,6 +38,12 @@ app.use('/map', mapRoute);
 app.use('/help', helpRoute);
 
 
+// TODO - Explore suitable javascript canvas library
+//           eg. jCanvas
+//               Paper.js
+//               Fabric.js
+
+
 // TODO - fix map so it scales to max/min coordinates
 // TODO - better detection of 'teleportation'
 // TODO - vector display system

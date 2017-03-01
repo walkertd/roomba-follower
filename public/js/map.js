@@ -1,12 +1,10 @@
 'use strict';
 
-var pathLayerContext;
-var robotBodyLayerContext;
-var textLayerContext;
-
+var pathCanvas;
 var pathLayer;
 var robotBodyLayer;
 var textLayer;
+
 var xOffset;
 var yOffset;
 
@@ -16,23 +14,28 @@ var yPrevious;
 var robotData = [];
 
 var lastPhase = '';
+var lastCoordinates = null;
 
 var playbackContinuous = false;
 var playbackStep = 0;
 
 $(document).ready(function () {
-  pathLayer = document.getElementById('path_layer');
-  robotBodyLayer = document.getElementById('robot_body_layer');
-  textLayer = document.getElementById('text_layer');
+  // pathLayer = document.getElementById('path_layer');
+  // robotBodyLayer = document.getElementById('robot_body_layer');
+  // textLayer = document.getElementById('text_layer');
 
-  pathLayer.width = sizeX;
-  pathLayer.height = sizeY;
+  pathCanvas = $('#map_canvas');
+  pathCanvas.attr('width', sizeX);
+  pathCanvas.attr('height', sizeY);
 
-  robotBodyLayer.width = sizeX;
-  robotBodyLayer.height = sizeY;
+  // pathLayer.width = sizeX;
+  // pathLayer.height = sizeY;
 
-  textLayer.width = sizeX;
-  textLayer.height = sizeY;
+  // robotBodyLayer.width = sizeX;
+  // robotBodyLayer.height = sizeY;
+
+  // textLayer.width = sizeX;
+  // textLayer.height = sizeY;
 
   $('#sizew').val(sizeX);
   $('#sizeh').val(sizeY);
@@ -44,14 +47,14 @@ $(document).ready(function () {
   updateMissionList();
   setPlaybackButtonStatus(false);
 
-  pathLayerContext = pathLayer.getContext('2d');
-  robotBodyLayerContext = robotBodyLayer.getContext('2d');
-  textLayerContext = textLayer.getContext('2d');
+  // pathLayerContext = pathLayer.getContext('2d');
+  // robotBodyLayerContext = robotBodyLayer.getContext('2d');
+  // textLayerContext = textLayer.getContext('2d');
 
-  pathLayerContext.beginPath();
-  pathLayerContext.lineWidth = 1;
-  pathLayerContext.strokeStyle = '#000000';
-  pathLayerContext.lineCap = 'round';
+  // pathLayerContext.beginPath();
+  // pathLayerContext.lineWidth = 1;
+  // pathLayerContext.strokeStyle = '#000000';
+  // pathLayerContext.lineCap = 'round';
 });
 
 function updateMissionList() {
@@ -89,8 +92,8 @@ function showMission() {
 function scaleMapToFitLimits(mapLimits) {
   var requiredHeight = parseInt(mapLimits.max_pose_x, 10) - parseInt(mapLimits.min_pose_x, 10) + 50;
   var requiredWidth = parseInt(mapLimits.max_pose_y, 10) - parseInt(mapLimits.min_pose_y, 10) + 50; // height and width are swapped with x and y since the map is rotated 90 degrees
-  var scaleX = Math.max(pathLayer.width / requiredWidth, 1.0);
-  var scaleY = Math.max(pathLayer.height / requiredHeight, 1.0);
+  var scaleX = Math.max(pathCanvas.attr('width') / requiredWidth, 1.0);
+  var scaleY = Math.max(pathCanvas.attr('height') / requiredHeight, 1.0);
   var mapScale = Math.min(scaleX, scaleY);
 
   // yOffset = (requiredHeight - parseInt(mapLimits.min_pose_x, 10)) / mapScale;
@@ -113,10 +116,10 @@ function scaleMapToFitLimits(mapLimits) {
   // var widthScale = sizeX / maxWidth;
   // var heightScale = sizeY / maxHeight;
   // mapScale = Math.max(widthScale, heightScale);
-  pathLayerContext.scale(mapScale, mapScale);
-  robotBodyLayerContext.scale(mapScale, mapScale);
-  textLayerContext.scale(mapScale, mapScale);
-  console.log(`Scaling to ${mapScale}`);
+  // pathLayerContext.scale(mapScale, mapScale);
+  // robotBodyLayerContext.scale(mapScale, mapScale);
+  // textLayerContext.scale(mapScale, mapScale);
+  // console.log(`Scaling to ${mapScale}`);
 }
 
 function setPlaybackButtonStatus(buttonStatus) {
@@ -209,14 +212,16 @@ function updateStep() {
 }
 
 function coordinateTranslate(x, y) {
-  x = pathLayer.width - (parseInt(x, 10) + xOffset);
+  x = pathCanvas.attr('width') - (parseInt(x, 10) + xOffset);
   y = (parseInt(y, 10) + yOffset);
   // var oldX = x;
+
+  // x = 100; y = 100;
 
   // // rotate
   // x = y;
   // y = pathLayer.height - oldX;
-  // x = pathLayer.width - x;
+  // x = pathLayer.width - x; 
 
   return { x: x, y: y };
 }
@@ -225,7 +230,7 @@ function checkForTeleportation(x, y) {
   var distance = Math.sqrt(Math.pow(xPrevious - x, 2) + Math.pow(yPrevious - y, 2));
   xPrevious = x;
   yPrevious = y;
-  return distance > 100; 
+  return distance > 100;
 }
 
 function drawStep(x, y, theta, cycle, phase) {
@@ -245,53 +250,93 @@ function drawStep(x, y, theta, cycle, phase) {
 
   // draw changes in status with text.
   if (phase !== lastPhase) {
-    textLayerContext.font = 'normal 12pt Calibri';
-    textLayerContext.fillStyle = 'blue';
-    textLayerContext.fillText(phase, x, y);
+    drawStatusText(x, y, phase);
     lastPhase = phase;
   } else {
-    if(isTeleporting) {
-      pathLayerContext.moveTo(x,y);
-      pathLayerContext.stroke();
-    } else {
-      pathLayerContext.lineTo(x, y);   
-      pathLayerContext.stroke();
+    if (!isTeleporting) {
+      if (lastCoordinates != null) {
+        pathCanvas.drawLine({
+          strokeStyle: '#000000',
+          strokeWidth: 1,
+          x1: lastCoordinates.x, y1: lastCoordinates.y,
+          x2: x, y2: y,
+          layer: true
+        });
+      }
     }
+    lastCoordinates = {
+      x: x,
+      y: y
+    };
   }
+  pathCanvas.drawLayers();
+}
+
+function drawStatusText(x, y, phase) {
+  //pathCanvas.removeLayer('textLayer');
+
+  pathCanvas.drawText({
+    fillStyle: 'blue',
+    fontSize: 12,
+    fontFamily: 'Calibri',
+    x: x,
+    y: y,
+    text: phase,
+    layer: true,
+    name: 'textLayer'
+  });
+
 }
 
 function drawRobotBody(x, y, theta) {
   theta = parseInt(theta, 10);
-  var radio = 15;
-  robotBodyLayerContext.clearRect(0, 0, robotBodyLayer.width, robotBodyLayer.height);
-  robotBodyLayerContext.beginPath();
-  robotBodyLayerContext.arc(x, y, radio, 0, 2 * Math.PI, false);
-  robotBodyLayerContext.fillStyle = 'green';
-  robotBodyLayerContext.fill();
-  robotBodyLayerContext.lineWidth = 3;
-  robotBodyLayerContext.strokeStyle = '#003300';
-  robotBodyLayerContext.stroke();
 
-  var outerX = x + radio * Math.cos((theta - 90) * (Math.PI / 180));
-  var outerY = y + radio * Math.sin((theta - 90) * (Math.PI / 180));
+  var radius = 25;
 
-  robotBodyLayerContext.beginPath();
-  robotBodyLayerContext.moveTo(x, y);
-  robotBodyLayerContext.lineTo(outerX, outerY);
-  robotBodyLayerContext.strokeStyle = '#003300';
-  robotBodyLayerContext.lineWidth = 3;
-  robotBodyLayerContext.stroke();
+  pathCanvas.removeLayer('robotBodyCircle');
+  pathCanvas.removeLayer('robotBodyDirection');
+
+  pathCanvas.drawArc({
+    groups: ['robotBody'],
+    x: x,
+    y: y,
+    radius: radius,
+    fillStyle: 'green',
+    strokeStyle: '#003300',
+    strokeWidth: 3,
+    layer: true,
+    name: 'robotBodyCircle'
+  }).drawVector({
+    groups: ['robotBody'],
+    strokeStyle: '#003300',
+    strokeWidth: 3,
+    x: x, y: y,
+    a1: theta, l1: radius,
+    layer: true,
+    name: 'robotBodyDirection'
+  });
+
 }
 
 function clearMap() {
   lastPhase = '';
-  pathLayerContext.clearRect(0, 0, pathLayer.width, pathLayer.height);
-  robotBodyLayerContext.clearRect(0, 0, robotBodyLayer.width, robotBodyLayer.height);
-  textLayerContext.clearRect(0, 0, textLayer.width, textLayer.height);
-  pathLayerContext.beginPath();
-  robotBodyLayerContext.scale(1, 1);
-  textLayerContext.scale(1, 1);
-  pathLayerContext.scale(1, 1);
+  // console.log(pathCanvas);
+  pathCanvas.clearCanvas();
+
+  pathCanvas.removeLayers();
+
+  pathLayer = null;
+  robotBodyLayer = null;
+  textLayer = null;
+  lastCoordinates = null;
+
+  // pathLayerContext.clearRect(0, 0, pathLayer.width, pathLayer.height);
+  // robotBodyLayerContext.clearRect(0, 0, robotBodyLayer.width, robotBodyLayer.height);
+  // textLayerContext.clearRect(0, 0, textLayer.width, textLayer.height);
+  // pathLayerContext.beginPath();
+  // robotBodyLayerContext.scale(1, 1);
+  // textLayerContext.scale(1, 1);
+  // pathLayerContext.scale(1, 1);
 }
 
 function getValue(name, actual) {
