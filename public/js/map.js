@@ -132,20 +132,41 @@ function setPlaybackButtonStatus(buttonStatus) {
   $('#playbackStepForwardButton').attr("disabled", !buttonStatus);
 }
 
+function setPlaybackButtonStatusWhilePlaying() {
+  $('#playbackFirstButton').attr("disabled", true);
+  $('#playbackReverseButton').attr("disabled", true);
+  $('#playbackPauseButton').attr("disabled", false);
+  $('#playbackForwardButton').attr("disabled", true);
+  $('#playbackLastButton').attr("disabled", true);
+  $('#playbackStepBackButton').attr("disabled", true);
+  $('#playbackStepForwardButton').attr("disabled", true);
+}
+
+function invokePlaybackForward() {
+  setPlaybackButtonStatusWhilePlaying();
+  playbackForward(true);
+}
+
+function invokePlaybackReverse() {
+  setPlaybackButtonStatusWhilePlaying();
+  playbackReverse(true);
+}
+
+function playbackPause() {
+  playbackContinuous = false;
+  setPlaybackButtonStatus(true);
+}
+
 function playbackFirst() {
   playbackContinuous = false;
   playbackStep = 1;
-  updateStep();
+  updateStep(false);
 }
 
 function playbackLast() {
   playbackContinuous = false;
   playbackStep = robotData.length;
-  updateStep();
-}
-
-function playbackPause() {
-  playbackContinuous = false;
+  updateStep(true);
 }
 
 function playbackForward(repeat) {
@@ -155,10 +176,12 @@ function playbackForward(repeat) {
     return;
   if (playbackStep < robotData.length) {
     playbackStep = playbackStep + 1;
-    updateStep();
+    updateStep(false);
     if (playbackContinuous) {
       setTimeout(playbackForward, updateEvery);
     }
+  } else {
+    setPlaybackButtonStatus(true);
   }
 }
 
@@ -169,14 +192,16 @@ function playbackReverse(repeat) {
     return;
   if (playbackStep > 1) {
     playbackStep = playbackStep - 1;
-    updateStep();
+    updateStep(true);
     if (playbackContinuous) {
       setTimeout(playbackReverse, updateEvery);
     }
+  } else {
+    setPlaybackButtonStatus(true);
   }
 }
 
-function updateStep() {
+function updateStep(erase) {
   $('#playbackCurrentStep').val(playbackStep);
   $('#playbackTotalSteps').val(robotData.length);
 
@@ -206,7 +231,8 @@ function updateStep() {
     record.pose_y,
     record.pose_theta,
     record.cycle,
-    record.phase
+    record.phase,
+    erase
   );
 
 }
@@ -233,7 +259,7 @@ function checkForTeleportation(x, y) {
   return distance > 100;
 }
 
-function drawStep(x, y, theta, cycle, phase) {
+function drawStep(x, y, theta, cycle, phase, erase) {
   if (phase === 'charge') {
     // hack (getMission() dont send x,y if phase is diferent as run)
     x = 0;
@@ -253,16 +279,22 @@ function drawStep(x, y, theta, cycle, phase) {
     drawStatusText(x, y, phase);
     lastPhase = phase;
   } else {
-    if (!isTeleporting) {
-      if (lastCoordinates != null) {
-        pathCanvas.drawLine({
-          strokeStyle: '#000000',
-          strokeWidth: 1,
-          x1: lastCoordinates.x, y1: lastCoordinates.y,
-          x2: x, y2: y,
-          layer: true
-        });
+    if (!erase) {
+      if (!isTeleporting) {
+        if (lastCoordinates != null) {
+          pathCanvas.drawLine({
+            strokeStyle: '#000000',
+            strokeWidth: 1,
+            x1: lastCoordinates.x, y1: lastCoordinates.y,
+            x2: x, y2: y,
+            layer: true,
+            name: `pathStep${playbackStep}`
+          });
+        }
       }
+    } else {
+      pathCanvas.removeLayer(`pathStep${playbackStep+1}`);
+      pathCanvas.removeLayer(`pathStep${playbackStep}`);
     }
     lastCoordinates = {
       x: x,

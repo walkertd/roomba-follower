@@ -44,9 +44,15 @@ app.use('/help', helpRoute);
 //               Fabric.js
 
 
+// TODO - process data so it's easier for the system to deal with?
+// TODO - add time slider
+// TODO - add show reverse path check box - draw reverse path and erase reverse path in forward
+// TODO - add show forward path check box - draw forward path and erase forward path in reverse
 // TODO - fix map so it scales to max/min coordinates
+// TODO - add rotation
+
 // TODO - better detection of 'teleportation'
-// TODO - vector display system
+// TODO - vector graphics instead of bitmap?
 
 
 // Error handling middleware
